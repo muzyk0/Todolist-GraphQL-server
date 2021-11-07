@@ -13,38 +13,50 @@ import { createConnection } from "typeorm";
 
 import cookieParser from "cookie-parser";
 import { PostRefreshToken } from "./routes/PostRefreshToken";
+import cors from "cors";
 
 (async () => {
-    const app = express();
-    app.use(cookieParser());
-    app.get("/", (_req, res) => {
-        res.send("Hello");
-    });
+    try {
+        const app = express();
+        app.use(
+            cors({
+                origin: (_origin, callback) => callback(null, true),
+                credentials: true,
+            })
+        );
 
-    app.use(PostRefreshToken);
+        app.use(cookieParser());
+        app.get("/", (_req, res) => {
+            res.send("Hello");
+        });
 
-    await createConnection();
+        app.use(PostRefreshToken);
 
-    const apolloServer = new ApolloServer({
-        schema: await buildSchema({
-            resolvers,
-        }),
-        context: ({ req, res }) => ({ req, res }),
-        plugins: [
-            // Install a landing page plugin based on NODE_ENV
-            process.env.NODE_ENV === "production"
-                ? ApolloServerPluginLandingPageDisabled()
-                : ApolloServerPluginLandingPageGraphQLPlayground(),
-        ],
-    });
+        await createConnection();
 
-    await apolloServer.start();
+        const apolloServer = new ApolloServer({
+            schema: await buildSchema({
+                resolvers,
+            }),
+            context: ({ req, res }) => ({ req, res }),
+            plugins: [
+                // Install a landing page plugin based on NODE_ENV
+                process.env.NODE_ENV === "production"
+                    ? ApolloServerPluginLandingPageDisabled()
+                    : ApolloServerPluginLandingPageGraphQLPlayground(),
+            ],
+        });
 
-    await apolloServer.applyMiddleware({ app });
+        await apolloServer.start();
 
-    app.listen(5000, () => {
-        console.log("Express server started in 5000");
-    });
+        await apolloServer.applyMiddleware({ app, cors: false });
+
+        app.listen(5000, () => {
+            console.log("Express server started in 5000");
+        });
+    } catch (error) {
+        console.log(error);
+    }
 })();
 
 // createConnection()

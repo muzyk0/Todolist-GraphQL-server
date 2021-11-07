@@ -1,3 +1,5 @@
+import { ApolloError } from "apollo-server-express";
+import { compare, hash } from "bcryptjs";
 import {
     Arg,
     Ctx,
@@ -15,35 +17,52 @@ import {
     Transaction,
     TransactionManager,
 } from "typeorm";
-import { hash, compare } from "bcryptjs";
+import {
+    createAccessToken,
+    createRefreshToken,
+    getPayloadFromContext,
+} from "../auth";
 import { User } from "../entity/User";
-import { AppContext } from "../types/AppCntext";
-import { createAccessToken, createRefreshToken } from "../auth";
 import { isAuth } from "../Middlewares/isAuth";
 import { sendRefreshToken } from "../sendRefreshToken";
+import { AppContext } from "../types/AppCntext";
 
 @ObjectType()
 export class LoginResponse {
     @Field()
     accessToken: string;
+
+    @Field(() => User)
+    user: User;
 }
 
 @Resolver()
 export class UserResolver {
-    @Query(() => String)
-    async me(): Promise<String> {
-        return "hi!";
+    @Query(() => User, { nullable: true })
+    @Transaction()
+    async me(
+        @Ctx() ctx: AppContext,
+        @TransactionManager() m: EntityManager
+    ): Promise<User | undefined> {
+        const userId = getPayloadFromContext(ctx)?.userId;
+
+        if (!userId) {
+            return;
+        }
+
+        return m.findOne(User, userId);
     }
 
-    @Query(() => String)
+    @Mutation(() => Boolean)
     @UseMiddleware(isAuth)
-    async logout(@Ctx() { payload }: AppContext) {
-        console.log(payload);
+    async logout(@Ctx() { res }: AppContext): Promise<boolean> {
+        sendRefreshToken(res, "");
 
-        return `your user id is: ${payload!.userId}`;
+        return true;
     }
 
     @Query(() => [User])
+    @UseMiddleware(isAuth)
     @Transaction()
     async users(@TransactionManager() m: EntityManager): Promise<User[]> {
         const users = await m.find(User, {
@@ -77,7 +96,7 @@ export class UserResolver {
         });
 
         if (!user) {
-            throw new Error("could not find user");
+            throw new ApolloError("could not find user");
         }
 
         const valid = await compare(password, user.password);
@@ -90,6 +109,7 @@ export class UserResolver {
 
         return {
             accessToken: createAccessToken(user),
+            user,
         };
     }
 

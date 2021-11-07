@@ -12,10 +12,6 @@ export const isAuth: MiddlewareFn<AppContext> = async ({ context }, next) => {
     const authorization: string | undefined =
         context.req.headers["authorization"];
 
-    // const authorization = context.req.headers.get("authorization");
-
-    console.log(context.req.headers);
-
     if (!authorization) {
         throw new Error("not authenticated");
     }
