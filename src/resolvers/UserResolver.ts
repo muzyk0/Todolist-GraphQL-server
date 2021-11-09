@@ -51,7 +51,6 @@ export class UserResolver {
     }
 
     @Query(() => User, { nullable: true })
-    @Transaction()
     async me(@Ctx() ctx: AppContext): Promise<User | undefined> {
         const userId = getPayloadFromContext(ctx)?.userId;
 

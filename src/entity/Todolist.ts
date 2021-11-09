@@ -24,7 +24,7 @@ export class Todolist extends BaseEntityWithDates {
     title: string;
 
     @Field(() => String, { nullable: true })
-    @Column("text")
+    @Column("text", { nullable: true })
     description?: string;
 
     @Field()

@@ -1,4 +1,4 @@
-import { Min } from "class-validator";
+import { MinLength } from "class-validator";
 import {
     Args,
     ArgsType,
@@ -21,7 +21,7 @@ export class AddTaskInput {
     @Field(() => Int)
     todolistId: number;
 
-    @Min(5, { message: "Length must be longer than 5 characters" })
+    @MinLength(5, { message: "Length must be longer than 5 characters" })
     @Field()
     title: string;
 
@@ -37,7 +37,7 @@ export class UpdateTaskInput {
     @Field(() => Int, { nullable: true })
     todolistId?: number;
 
-    @Min(5, { message: "Length must be longer than 5 characters" })
+    @MinLength(5, { message: "Length must be longer than 5 characters" })
     @Field({ nullable: true })
     title?: string;
 

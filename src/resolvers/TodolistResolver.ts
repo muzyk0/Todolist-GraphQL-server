@@ -69,11 +69,10 @@ export class TodolistResolver {
     async addTodolist(
         @TransactionManager() m: EntityManager,
         @Ctx() ctx: AppContext,
-        @Args() { title, description }: AddTodolistInput
+        @Args() options: AddTodolistInput
     ): Promise<Todolist> {
         const todolist = m.create(Todolist, {
-            title,
-            description,
+            ...options,
             userId: ctx.payload!.userId,
             // tasks: [1, 2].map((taskId) => m.create(Task, { id: taskId })),
         });
