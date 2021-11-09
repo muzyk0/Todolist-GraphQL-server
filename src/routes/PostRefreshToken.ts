@@ -15,9 +15,11 @@ export const PostRefreshToken = router.post(
     "/refresh_token",
     async (req, res: Response<RefreshTokenResponse>) => {
         const token = req.cookies.tdl;
+
         if (!token) {
             return res.send({ ok: false, accessToken: "" });
         }
+
         let payload: any = null;
         try {
             payload = verify(token, process.env.REFRESH_TOKEN_SECRET!);

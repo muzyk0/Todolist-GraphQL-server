@@ -4,6 +4,7 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     Column,
+    DeleteDateColumn,
 } from "typeorm";
 
 @ObjectType()
@@ -17,6 +18,6 @@ export class BaseEntityWithDates extends BaseEntity {
     updatedAt: Date;
 
     @Field()
-    @Column({ default: false })
-    archived: boolean;
+    @DeleteDateColumn()
+    deletedAt?: Date;
 }

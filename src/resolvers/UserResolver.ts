@@ -4,6 +4,7 @@ import {
     Arg,
     Ctx,
     Field,
+    FieldResolver,
     Int,
     Mutation,
     ObjectType,
@@ -22,6 +23,7 @@ import {
     createRefreshToken,
     getPayloadFromContext,
 } from "../auth";
+import { Todolist } from "../entity/Todolist";
 import { User } from "../entity/User";
 import { isAuth } from "../Middlewares/isAuth";
 import { sendRefreshToken } from "../sendRefreshToken";
@@ -36,21 +38,28 @@ export class LoginResponse {
     user: User;
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+    @FieldResolver(() => [Todolist])
+    @UseMiddleware(isAuth)
+    async todolists(@Ctx() ctx: AppContext): Promise<Todolist[]> {
+        return await Todolist.find({
+            where: {
+                userId: ctx.payload!.userId,
+            },
+        });
+    }
+
     @Query(() => User, { nullable: true })
     @Transaction()
-    async me(
-        @Ctx() ctx: AppContext,
-        @TransactionManager() m: EntityManager
-    ): Promise<User | undefined> {
+    async me(@Ctx() ctx: AppContext): Promise<User | undefined> {
         const userId = getPayloadFromContext(ctx)?.userId;
 
         if (!userId) {
             return;
         }
 
-        return m.findOne(User, userId);
+        return User.findOne(userId);
     }
 
     @Mutation(() => Boolean)

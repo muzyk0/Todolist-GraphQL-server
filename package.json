@@ -1,5 +1,6 @@
 {
     "name": "server",
+    "author": "muzyk0",
     "version": "0.0.1",
     "description": "Todolist GraphQL server",
     "dependencies": {

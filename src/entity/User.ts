@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { BaseEntityWithDates } from "./BaseEntityWithDates";
+import { Todolist } from "./Todolist";
 
 @ObjectType()
 @Entity("users")
@@ -22,4 +23,7 @@ export class User extends BaseEntityWithDates {
 
     @Column("int", { default: 0 })
     tokenVersion: number;
+
+    @OneToMany(() => Todolist, (todolist) => todolist.user)
+    todolists: Todolist[];
 }
