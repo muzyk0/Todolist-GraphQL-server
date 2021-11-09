@@ -21,7 +21,7 @@ export class Todolist extends BaseEntityWithDates {
 
     @Field(() => String)
     @Column("text")
-    title!: string;
+    title: string;
 
     @Field(() => String, { nullable: true })
     @Column("text")
@@ -35,7 +35,7 @@ export class Todolist extends BaseEntityWithDates {
     @Column()
     userId: number;
 
-    // @Field(() => [Task])
+    @Field(() => [Task])
     @OneToMany(() => Task, (task) => task.todolist)
     @JoinColumn()
     tasks: Task[];

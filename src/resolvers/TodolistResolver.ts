@@ -19,7 +19,7 @@ import { isAuth } from "../Middlewares/isAuth";
 import { AppContext } from "../types/AppCntext";
 
 @ArgsType()
-export class AddTodolistDTO {
+export class AddTodolistInput {
     @Field()
     title: string;
 
@@ -28,7 +28,7 @@ export class AddTodolistDTO {
 }
 
 @ArgsType()
-export class UpdateTodolistDTO {
+export class UpdateTodolistInput {
     @Field(() => Int)
     id: number;
 
@@ -41,10 +41,10 @@ export class UpdateTodolistDTO {
 
 @Resolver(() => Todolist)
 export class TodolistResolver {
-    @FieldResolver(() => [Task])
-    async taskList(@Root() todolist: Todolist) {
-        return Task.find({ where: { todolistId: todolist.id } });
-    }
+    // @FieldResolver(() => [Task])
+    // async taskList(@Root() todolist: Todolist) {
+    //     return Task.find({ where: { todolistId: todolist.id } });
+    // }
 
     @Query(() => [Todolist])
     @UseMiddleware(isAuth)
@@ -69,7 +69,7 @@ export class TodolistResolver {
     async addTodolist(
         @TransactionManager() m: EntityManager,
         @Ctx() ctx: AppContext,
-        @Args() { title, description }: AddTodolistDTO
+        @Args() { title, description }: AddTodolistInput
     ): Promise<Todolist> {
         const todolist = m.create(Todolist, {
             title,
@@ -86,7 +86,7 @@ export class TodolistResolver {
     @Transaction()
     async updateTodolist(
         @TransactionManager() m: EntityManager,
-        @Args() { id, title, description }: UpdateTodolistDTO
+        @Args() { id, ...options }: UpdateTodolistInput
     ): Promise<Todolist> {
         const todolist = await m.findOne(Todolist, id);
 
@@ -94,10 +94,7 @@ export class TodolistResolver {
             throw new Error("Todolist not found");
         }
 
-        await m.update(Todolist, todolist.id, {
-            title,
-            description,
-        });
+        await m.update(Todolist, todolist.id, options);
 
         return m.findOneOrFail(Todolist, todolist.id);
     }
@@ -107,7 +104,7 @@ export class TodolistResolver {
     @Transaction()
     async removeTodolist(
         @TransactionManager() m: EntityManager,
-        @Arg("id") id: number
+        @Arg("id", () => Int) id: number
     ) {
         const todolist = await m.findOne(Todolist, id);
 
@@ -116,9 +113,5 @@ export class TodolistResolver {
         }
         todolist.softRemove();
         return true;
-
-        // todolist.archived = true;
-
-        // return m.save(Todolist, todolist);
     }
 }
