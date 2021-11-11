@@ -14,9 +14,9 @@ export class Task extends BaseEntityWithDates {
     @Column("text")
     title: string;
 
-    @Field()
-    @Column("text")
-    description: string;
+    @Field({ nullable: true })
+    @Column("text", { nullable: true })
+    description?: string;
 
     @ManyToOne(() => Todolist, (todolist) => todolist.tasks)
     todolist: Todolist;

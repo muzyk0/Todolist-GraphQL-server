@@ -91,6 +91,33 @@ export class UserResolver {
         return true;
     }
 
+    @Mutation(() => Boolean)
+    @Transaction()
+    async updatePassword(
+        @TransactionManager() m: EntityManager,
+        @Arg("password") password: string,
+        @Ctx() ctx: AppContext
+    ): Promise<boolean> {
+        const user = await m.findOne(User, ctx.payload?.userId);
+
+        if (!user) {
+            throw new ApolloError("could not find user");
+        }
+
+        // const valid = await compare(password, user.password);
+
+        // if (!valid) {
+        //     throw new Error("Bad password");
+        // }
+
+        const hashedPassword = await hash(password, 12);
+
+        user.password = hashedPassword;
+        m.save(user);
+
+        return true;
+    }
+
     @Mutation(() => LoginResponse)
     @Transaction()
     async login(

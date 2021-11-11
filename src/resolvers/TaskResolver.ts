@@ -1,5 +1,6 @@
 import { MinLength } from "class-validator";
 import {
+    Arg,
     Args,
     ArgsType,
     Ctx,
@@ -25,8 +26,8 @@ export class AddTaskInput {
     @Field()
     title: string;
 
-    @Field()
-    description: string;
+    @Field({ nullable: true })
+    description?: string;
 }
 
 @ArgsType()
@@ -45,8 +46,24 @@ export class UpdateTaskInput {
     description?: string;
 }
 
-@Resolver(() => Todolist)
+@Resolver(() => Task)
 export class TaskResolver {
+    @Query(() => [Task])
+    @UseMiddleware(isAuth)
+    @Transaction()
+    async tasks(
+        @TransactionManager() m: EntityManager,
+        @Arg("id", () => Int) id: number
+    ): Promise<Task[]> {
+        const tasks = m.find(Task, {
+            where: {
+                todolistId: id,
+            },
+        });
+
+        return tasks;
+    }
+
     @Mutation(() => Task)
     @UseMiddleware(isAuth)
     @Transaction()
