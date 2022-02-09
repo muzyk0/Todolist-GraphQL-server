@@ -2,6 +2,7 @@
     "name": "server",
     "author": "muzyk0",
     "version": "0.0.1",
+    "license": "(ISC OR GPL-3.0)",
     "description": "Todolist GraphQL server",
     "dependencies": {
         "apollo-server-express": "^3.5.0",
@@ -32,6 +33,7 @@
         "typescript": "4.4.4"
     },
     "scripts": {
-        "start": "nodemon --exec ts-node src/index.ts"
+        "start": "tsc && node ./dist/index.js",
+        "dev": "nodemon --exec ts-node src/index.ts"
     }
 }
