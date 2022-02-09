@@ -29,6 +29,9 @@ services:
             - webnet
         depends_on:
             - "postgres"
+        volumes:
+            - ./src:/app/src
+            - ./dist:/app/dist
         # command: ["./wait-for-it.sh", "postgres:5432", "--", "node", "index.js"]
         restart: always
 

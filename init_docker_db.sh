@@ -2,7 +2,7 @@
 
 # Этот скрипт запускается один раз, при развертывании системы на машине разработчика
 
-# cd ./deploy/dev-local && \
+# cd ./deploy/dev && \
 docker-compose -p todolist-graphql-server build && \
 docker-compose -p todolist-graphql-server up -d postgres && \
 sleep 5 # надо дать время базе данных на загрузку и подготовку к работе

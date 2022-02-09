@@ -5,6 +5,7 @@ import {
     Ctx,
     Field,
     FieldResolver,
+    InputType,
     Int,
     Mutation,
     ObjectType,
@@ -36,6 +37,15 @@ export class LoginResponse {
 
     @Field(() => User)
     user: User;
+}
+
+@InputType()
+export class UpdatePasswordInput {
+    @Field()
+    currentPassword: string;
+
+    @Field()
+    newPassword: string;
 }
 
 @Resolver(User)
@@ -95,8 +105,9 @@ export class UserResolver {
     @Transaction()
     async updatePassword(
         @TransactionManager() m: EntityManager,
-        @Arg("password") password: string,
-        @Ctx() ctx: AppContext
+        @Ctx() ctx: AppContext,
+        @Arg("data", () => UpdatePasswordInput)
+        { currentPassword, newPassword }: UpdatePasswordInput
     ): Promise<boolean> {
         const user = await m.findOne(User, ctx.payload?.userId);
 
@@ -104,13 +115,13 @@ export class UserResolver {
             throw new ApolloError("could not find user");
         }
 
-        // const valid = await compare(password, user.password);
+        const valid = await compare(currentPassword, user.password);
 
-        // if (!valid) {
-        //     throw new Error("Bad password");
-        // }
+        if (!valid) {
+            throw new Error("Bad password");
+        }
 
-        const hashedPassword = await hash(password, 12);
+        const hashedPassword = await hash(newPassword, 12);
 
         user.password = hashedPassword;
         m.save(user);
@@ -122,9 +133,9 @@ export class UserResolver {
     @Transaction()
     async login(
         @TransactionManager() m: EntityManager,
+        @Ctx() { res }: AppContext,
         @Arg("email") email: string,
-        @Arg("password") password: string,
-        @Ctx() { res }: AppContext
+        @Arg("password") password: string
     ): Promise<LoginResponse> {
         const user = await m.findOne(User, {
             where: { email },
