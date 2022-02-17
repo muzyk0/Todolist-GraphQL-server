@@ -8,13 +8,12 @@ WORKDIR /app
 COPY ["package.json", "yarn.lock", "./"]
 RUN yarn --frozen-lockfile
 
-# Source 
+# Source
 COPY . .
 
 # RUN ["chmod", "+x", "wait-for-it.sh"]
 
-RUN yarn tsc
-CMD node ./dist/index.js
+# RUN
+CMD yarn dev
 
-# RUN yarn start
 EXPOSE 5000

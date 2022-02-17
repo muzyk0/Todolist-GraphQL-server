@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+    postgres:
+        image: postgres
+        volumes:
+            - db:/var/lib/postgresql/data
+        environment:
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+            #!!
+            - "5432:5432"
+        networks:
+            - webnet
+        restart: always
+
+    server:
+        build:
+            context: ../../
+            dockerfile: ./deploy/prod/Dockerfile
+        image: todolist-graphql
+        environment:
+            TYPEORM_URL: postgres://postgres:${DB_PASSWORD}@postgres:5432/graphql_todolist
+            TYPEORM_SYNCHRONIZE: "false"
+            TYPEORM_ENTITIES: dist/entity/**/*.js
+            TYPEORM_MIGRATIONS: dist/migration/**/*.js
+            TYPEORM_SUBSCRIBERS: dist/subscriber/**/*.js
+        ports:
+            - "5000:5000"
+        networks:
+            - webnet
+        depends_on:
+            - "postgres"
+        volumes:
+            - ../../src:/app/src
+            - ../../dist:/app/dist
+        # command: ["./wait-for-it.sh", "postgres:5432", "--", "node", "index.js"]
+        restart: always
+
+networks:
+    webnet:
+
+volumes:
+    db:

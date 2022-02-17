@@ -1,0 +1,13 @@
+setup:
+    addons:
+        - plan: graphql_todolist
+          as: DATABASE
+build:
+    deploy:
+        prod: Dockerfile
+release:
+    command:
+        - ./create_docker_db.sh
+    image: prod
+run:
+    prod: yarn start

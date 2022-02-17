@@ -1,0 +1,6 @@
+{
+    "restartable": false,
+    "watch": ["dist"],
+    "exec": "NODE_ENV=dev yarn node --inspect=0.0.0.0:9229 ./dist/index.js",
+    "delay": 500
+}

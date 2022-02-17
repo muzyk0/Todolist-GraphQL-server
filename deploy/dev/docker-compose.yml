@@ -15,8 +15,8 @@ services:
 
     server:
         build:
-            context: ..
-            dockerfile: ./prod/Dockerfile
+            context: ../../
+            dockerfile: ./deploy/dev/Dockerfile
         image: todolist-graphql
         environment:
             TYPEORM_URL: postgres://postgres:${DB_PASSWORD}@postgres:5432/graphql_todolist
@@ -26,13 +26,14 @@ services:
             TYPEORM_SUBSCRIBERS: dist/subscriber/**/*.js
         ports:
             - "5000:5000"
+            - "9229:9229"
         networks:
             - webnet
         depends_on:
             - "postgres"
         volumes:
-            - ../src:/app/src
-            - ../dist:/app/dist
+            - ../../src:/app/src
+            - ../../dist:/app/dist
         # command: ["./wait-for-it.sh", "postgres:5432", "--", "node", "index.js"]
         restart: always
 

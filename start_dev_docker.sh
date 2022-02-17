@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 
-cd ./prod && \
+cd ./deploy/dev && \
 docker-compose -p todolist-graphql-server \
     up --build
