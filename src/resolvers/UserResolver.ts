@@ -102,6 +102,7 @@ export class UserResolver {
     }
 
     @Mutation(() => Boolean)
+    @UseMiddleware(isAuth)
     @Transaction()
     async updatePassword(
         @TransactionManager() m: EntityManager,
@@ -109,7 +110,7 @@ export class UserResolver {
         @Arg("data", () => UpdatePasswordInput)
         { currentPassword, newPassword }: UpdatePasswordInput
     ): Promise<boolean> {
-        const user = await m.findOne(User, ctx.payload?.userId);
+        const user = await m.findOne(User, ctx.payload!.userId);
 
         if (!user) {
             throw new ApolloError("could not find user");

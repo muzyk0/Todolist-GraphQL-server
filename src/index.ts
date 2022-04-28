@@ -15,6 +15,8 @@ import cookieParser from "cookie-parser";
 import { PostRefreshToken } from "./routes/PostRefreshToken";
 import cors from "cors";
 
+const PORT: string = process.env.PORT ?? "5000";
+
 (async () => {
     try {
         const app = express();
@@ -44,7 +46,7 @@ import cors from "cors";
         await apolloServer.start();
         apolloServer.applyMiddleware({ app, cors: false });
 
-        app.listen(5000, () => {
+        app.listen(PORT, () => {
             console.log("Express server started in 5000");
         });
     } catch (error) {

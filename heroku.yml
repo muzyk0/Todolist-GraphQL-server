@@ -3,11 +3,14 @@ setup:
         - plan: graphql_todolist
           as: DATABASE
 build:
-    deploy:
+    docker:
         prod: Dockerfile
 release:
     command:
         - ./create_docker_db.sh
     image: prod
 run:
-    prod: yarn start
+    server:
+        command:
+            - ./start_prod_docker.sh
+        image: prod
