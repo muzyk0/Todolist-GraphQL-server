@@ -30,10 +30,18 @@ const typeOrmOptions: PostgresConnectionOptions = {
     username: connectionOptions.user,
     password: connectionOptions.password,
     database: connectionOptions.database as string | undefined,
-    synchronize: true,
-    entities: ["target/entity/**/*.js"],
     extra: {
         ssl: true
+    },
+    "synchronize": false,
+    "logging": false,
+    "entities": ["dist/entity/**/*.js"],
+    "migrations": ["dist/migration/**/*.js"],
+    "subscribers": ["dist/subscriber/**/*.js"],
+    "cli": {
+        "entitiesDir": "src/entity",
+        "migrationsDir": "src/migration",
+        "subscribersDir": "src/subscriber"
     }
 };
 
