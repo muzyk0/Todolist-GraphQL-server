@@ -5,6 +5,7 @@
     "license": "(ISC OR GPL-3.0)",
     "description": "Todolist GraphQL server",
     "dependencies": {
+        "all": "^0.0.0",
         "apollo-server-express": "^3.5.0",
         "bcryptjs": "^2.4.3",
         "class-validator": "^0.13.1",
@@ -16,7 +17,6 @@
         "graphql": "^15.7.2",
         "jsonwebtoken": "^8.5.1",
         "pg": "^8.4.0",
-        "pg-connection-string": "^2.5.0",
         "reflect-metadata": "^0.1.10",
         "type-graphql": "^1.1.1",
         "typeorm": "0.2.38"
@@ -36,9 +36,9 @@
     },
     "scripts": {
         "build": "tsc",
-        "heroku-prebuild": "rm -rf dist",
+        "heroku-prebuild": "rm -rf node_modules dist",
         "heroku-postbuild": "typeorm migration:run",
-        "start": "node ./dist/index.js",
+        "start": "node dist/index.js",
         "dev": "concurrently -k \"mkdir -p dist && rm -rf dist/* && nodemon\" \"tsc --watch --preserveWatchOutput\""
     }
 }

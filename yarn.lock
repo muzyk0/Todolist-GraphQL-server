@@ -341,6 +341,11 @@ acorn@^8.4.1:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.5.0.tgz#4512ccb99b3698c752591e9bb4472e38ad43cee2"
   integrity sha512-yXbYeFy+jUuYd3/CDcg2NkIYE991XYX/bje7LmjJigUciaeO1JR4XxXgCIV1/Zc/dRuFEyw1L0pbA+qynJkW5Q==
 
+all@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/all/-/all-0.0.0.tgz#fb2aa75d4759d40e39ecbb118fabf0cc11ff554f"
+  integrity sha512-0oKlfNVv2d+d7c1gwjGspzgbwot47PGQ4b3v1ccx4mR8l9P/Y6E6Dr/yE8lNT63EcAKEbHo6UG3odDpC/NQcKw==
+
 ansi-align@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/ansi-align/-/ansi-align-3.0.1.tgz#0cdf12e111ace773a86e9a1fad1225c43cb19a59"
