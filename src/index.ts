@@ -10,49 +10,46 @@ import {
 } from "apollo-server-core";
 import { buildSchema } from "type-graphql";
 import resolvers from "./resolvers";
-import { createConnection } from "typeorm";
+import {ConnectionOptions, createConnection, getConnectionOptions} from "typeorm";
 
 import cookieParser from "cookie-parser";
 import { PostRefreshToken } from "./routes/PostRefreshToken";
 import cors from "cors";
-import {PostgresConnectionOptions} from "typeorm/driver/postgres/PostgresConnectionOptions";
 import * as fs from "fs";
 
 const PORT: string = process.env.PORT ?? "5000";
 
 const databaseUrl: string = process.env.DATABASE_URL ?? '';
-const connectionOptions = PostgressConnectionStringParser.parse(databaseUrl);
-const typeOrmOptions: PostgresConnectionOptions = {
-    type: "postgres",
-    name: connectionOptions.application_name,
-    host: connectionOptions.host as string | undefined,
-    port: connectionOptions.port as number | undefined,
-    username: connectionOptions.user,
-    password: connectionOptions.password,
-    database: connectionOptions.database as string | undefined,
-    extra: {
-        ssl: true
-    },
-    "synchronize": false,
-    "logging": false,
-    "entities": ["dist/entity/**/*.js"],
-    "migrations": ["dist/migration/**/*.js"],
-    "subscribers": ["dist/subscriber/**/*.js"],
-    "cli": {
-        "entitiesDir": "src/entity",
-        "migrationsDir": "src/migration",
-        "subscribersDir": "src/subscriber"
-    }
-};
 
-const json = JSON.stringify(typeOrmOptions, null, 2);
-fs.writeFile("./ormconfig.json", json, (err) => {
-    if (err) {
-        console.error(err);
-        return;
+const getOptions = async () => {
+    let connectionOptions: ConnectionOptions;
+    connectionOptions = {
+        type: 'postgres',
+        extra: {
+            ssl: true,
+        },
+        synchronize: false,
+        logging: false,
+        entities: ["dist/entity/**/*.js"],
+        migrations: ["dist/migration/**/*.js"],
+        subscribers: ["dist/subscriber/**/*.js"],
+        cli: {
+            "entitiesDir": "src/entity",
+            "migrationsDir": "src/migration",
+            "subscribersDir": "src/subscriber"
+        }
+    };
+    if (process.env.DATABASE_URL) {
+        Object.assign(connectionOptions, { url: databaseUrl });
+    } else {
+        // gets your default configuration
+        // you could get a specific config by name getConnectionOptions('production')
+        // or getConnectionOptions(process.env.NODE_ENV)
+        connectionOptions = await getConnectionOptions();
     }
-    console.log("File has been created");
-});
+
+    return connectionOptions;
+};
 
 (async () => {
     try {
@@ -66,7 +63,8 @@ fs.writeFile("./ormconfig.json", json, (err) => {
         app.use(cookieParser());
         app.use(PostRefreshToken);
 
-        await createConnection(typeOrmOptions);
+        const typeOrmConfig = await getOptions();
+        await createConnection(typeOrmConfig);
 
         const apolloServer = new ApolloServer({
             schema: await buildSchema({
